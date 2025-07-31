@@ -1,0 +1,45 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+model Review {
+  id          Int          @id @default(autoincrement())
+  name        String
+  date        DateTime
+  rating      Int
+  product     String
+  productType String
+  text        String
+  source      String?
+  sentiment   Sentiment
+
+  reviewsTags ReviewTag[]
+}
+
+model Tag {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  reviewsTags ReviewTag[]
+}
+
+model ReviewTag {
+  review   Review  @relation(fields: [reviewId], references: [id])
+  reviewId Int
+  tag      Tag     @relation(fields: [tagId], references: [id])
+  tagId    Int
+
+  @@id([reviewId, tagId])
+}
